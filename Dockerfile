@@ -1,42 +1,11 @@
-FROM ubuntu:14.04
-
-# hopefully temporary work-around of http://git.io/Ke_Meg#1724 
-RUN apt-mark hold initscripts udev plymouth mountall
-
-# Add package sources
-RUN apt-get -y update
-RUN apt-get -y install software-properties-common
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test
-
+FROM ubuntu:15.04
 
 RUN apt-get -y update
-RUN apt-get -y upgrade
-
-
-# Various dependencies
-RUN apt-get -y install pkg-config
-RUN apt-get -y install git
-RUN apt-get -y install scons
-RUN apt-get -y install ctags
-
-
-RUN add-apt-repository ppa:boost-latest/ppa
-RUN apt-get -y install libboost1.55-all-dev
-
-
-RUN apt-get -y install protobuf-compiler
-RUN apt-get -y install libprotobuf-dev
-RUN apt-get -y install libssl-dev
-
-# Upgrade to gcc-4.9 (after some other package pulls in gcc)
-RUN apt-get -y install gcc-4.9 g++-4.9
-RUN rm -f /usr/bin/gcc && ln -s /usr/bin/gcc-4.9 /usr/bin/gcc
-RUN rm -f /usr/bin/g++ && ln -s /usr/bin/g++-4.9 /usr/bin/g++
-
-
-# Checkout the ripple source
-RUN git clone https://github.com/ripple/rippled.git /opt/rippled -b develop
-RUN cd /opt/rippled && scons build/rippled
+RUN apt-get -y install yum-utils alien
+RUN rpm -Uvh https://mirrors.ripple.com/ripple-repo-el7.rpm
+RUN yumdownloader --enablerepo=ripple-stable --releasever=el7 rippled
+RUN rpm --import https://mirrors.ripple.com/rpm/RPM-GPG-KEY-ripple-release && rpm -K rippled*.rpm
+RUN alien -i --scripts rippled*.rpm && rm rippled*.rpm
 
 
 # peer_port
@@ -50,9 +19,7 @@ EXPOSE 6006
 # Share the ripple data directory
 VOLUME /var/lib/rippled
 
-RUN mkdir /opt/rippled/build/db
-
 # Add custom config
-ADD rippled.cfg /opt/rippled/build/rippled.cfg
+ADD rippled.cfg /etc/rippled.cfg
 
-CMD ["/opt/rippled/build/rippled", "--net", "--conf", "/opt/rippled/build/rippled.cfg"]
+CMD ["/opt/ripple/bin/rippled", "--net", "--conf", "/etcc/rippled.cfg"]
