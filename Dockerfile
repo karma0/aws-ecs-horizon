@@ -21,5 +21,6 @@ VOLUME /var/lib/rippled
 
 # Add custom config
 ADD rippled.cfg /etc/rippled.cfg
+ADD validators.txt /etc/validators.txt
 
-CMD ["/opt/ripple/bin/rippled", "--net", "--conf", "/etcc/rippled.cfg"]
+CMD ["/opt/ripple/bin/rippled", "--net", "--fg", "--conf", "/etc/rippled.cfg"]
