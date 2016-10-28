@@ -19,8 +19,10 @@ EXPOSE 6006
 # Share the ripple data directory
 VOLUME /var/lib/rippled
 
+# Bring in the validators
+ADD validators.txt /etc/validators.txt
+
 # Add custom config
 ADD rippled.cfg /etc/rippled.cfg
-ADD validators.txt /etc/validators.txt
 
 CMD ["/opt/ripple/bin/rippled", "--net", "--fg", "--conf", "/etc/rippled.cfg"]
