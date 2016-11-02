@@ -7,6 +7,10 @@ RUN yumdownloader --enablerepo=ripple-stable --releasever=el7 rippled
 RUN rpm --import https://mirrors.ripple.com/rpm/RPM-GPG-KEY-ripple-release && rpm -K rippled*.rpm
 RUN alien -i --scripts rippled*.rpm && rm rippled*.rpm
 
+# No-IP dynamic dns configuration
+#  Could be bash script:
+#  curl 'https://username:password@dynupdate.no-ip.com/nic/update?hostname=example.domain.com'
+RUN ./noip.sh
 
 # peer_port
 EXPOSE 51235
@@ -25,4 +29,4 @@ ADD validators.txt /etc/validators.txt
 # Add custom config
 ADD rippled.cfg /etc/rippled.cfg
 
-CMD ["/opt/ripple/bin/rippled", "--net", "--fg", "--conf", "/etc/rippled.cfg"]
+CMD ["/opt/ripple/bin/rippled", "--fg", "--conf", "/etc/rippled.cfg"]
