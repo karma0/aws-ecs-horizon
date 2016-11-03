@@ -22,6 +22,7 @@ You will also need to setup the `noip.sh` script.
 
 ```bash
 cp -p noip.sh{.example,}
+chmod 750 noip.sh
 ```
 
 By default, you won't need to modify this script, but if you decide to use a dynamic DNS provider, then you will need to modify the script to hit the server.  [No IP](https://www.noip.com/) example provided.
