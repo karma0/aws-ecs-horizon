@@ -18,21 +18,13 @@ Before executing the scripts, edit the `env.sh` file and run the following:
 source env.sh
 ```
 
-Then you may also want to setup a dynamic DNS account and put the update into a script named `noip.sh`.
+You will also need to setup the `noip.sh` script.
 
 ```bash
-echo '#!/bin/bash' > noip.sh
-echo "curl 'http://username:password@dynupdate.no-ip.com/nic/update?hostname=mytest.testdomain.com&myip=1.2.3.4'" >> noip.sh
-chmod 750 noip.sh
+cp -p noip.sh{.example,}
 ```
 
-Or, if you just want to bypass dynamic DNS updates:
-
-```bash
-echo '#!/bin/bash' > noip.sh
-echo 'exit 0' >> noip.sh
-chmod 750 noip.sh
-```
+By default, you won't need to modify this script, but if you decide to use a dynamic DNS provider, then you will need to modify the script to hit the server.  [No IP](https://www.noip.com/) example provided.
 
 
 ### Build a docker image

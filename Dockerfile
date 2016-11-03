@@ -10,7 +10,7 @@ RUN alien -i --scripts rippled*.rpm && rm rippled*.rpm
 # peer_port
 EXPOSE 51235
 # websocket_public_port
-EXPOSE 5006
+EXPOSE 5005
 # websocket_port (trusted access)
 EXPOSE 6006
 

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Edit the username, password, and hostname parameters to post to No IP (https://www.noip.com/)
+#curl 'https://username:password@dynupdate.no-ip.com/nic/update?hostname=rippled.example.com'
+
+exit 0
