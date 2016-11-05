@@ -29,6 +29,5 @@ ADD rippled.cfg /etc/rippled.cfg
 #  curl 'https://username:password@dynupdate.no-ip.com/nic/update?hostname=example.domain.com'
 ADD noip.sh /root/noip.sh
 
-#CMD ["/opt/ripple/bin/rippled", "--fg", "--conf", "/etc/rippled.cfg"]
-CMD /root/noip.sh && /opt/ripple/bin/rippled --fg --conf /etc/rippled.cfg
+CMD /root/noip.sh && /opt/ripple/bin/rippled --quiet --fg --conf /etc/rippled.cfg
 
