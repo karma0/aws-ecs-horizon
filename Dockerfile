@@ -1,33 +1,75 @@
-FROM ubuntu:15.04
+FROM stellar/base:latest
 
-RUN apt-get -y update
-RUN apt-get -y install yum-utils alien
-RUN rpm -Uvh https://mirrors.ripple.com/ripple-repo-el7.rpm
-RUN yumdownloader --enablerepo=ripple-stable --releasever=el7 rippled
-RUN rpm --import https://mirrors.ripple.com/rpm/RPM-GPG-KEY-ripple-release && rpm -K rippled*.rpm
-RUN alien -i --scripts rippled*.rpm && rm rippled*.rpm
+MAINTAINER Bobby Larson <karma0@gmail.com>
 
-# peer_port
-EXPOSE 51235
-# websocket_public_port
-EXPOSE 5005
-# websocket_port (trusted access)
-EXPOSE 6006
+ENV STELLAR_CORE_VERSION 0.5.0-298-6f07377f
+ENV HORIZON_VERSION 0.6.1
 
 
-# Share the ripple data directory
-VOLUME /var/lib/rippled
+#####
+# Docker Setup
+###
 
-# Bring in the validators
-ADD validators.txt /etc/validators.txt
+## PORTS
+# PostgreSQL
+#EXPOSE 5432
+# Horizon main HTTP port
+EXPOSE 8000
+# stellar-core main HTTP port
+EXPOSE 11625
+# stellar-core peer node port
+EXPOSE 11626
 
-# Add custom config
-ADD rippled.cfg /etc/rippled.cfg
+# Share the horizon data directory
+VOLUME /opt/stellar
+
+
+#####
+# Scripts
+###
+
+ADD dependencies /
+RUN ["chmod", "+x", "dependencies"]
+RUN /dependencies
+
+ADD install /
+RUN ["chmod", "+x", "install"]
+RUN /install
+
+
+#####
+# Setup Application
+###
+
+RUN ["mkdir", "-p", "/opt/stellar"]
+# Make this ephemeral (as opposed to persistant)
+#RUN ["touch", "/opt/stellar/.docker-ephemeral"]
+
+RUN [ "adduser", \
+  "--disabled-password", \
+  "--gecos", "\"\"", \
+  "--uid", "10011001", \
+  "stellar"]
+
+RUN ["ln", "-s", "/opt/stellar", "/stellar"]
+RUN ["ln", "-s", "/opt/stellar/core/etc/stellar-core.cfg", "/stellar-core.cfg"]
+RUN ["ln", "-s", "/opt/stellar/horizon/etc/horizon.env", "/horizon.env"]
+ADD common /opt/stellar-default/common
+ADD pubnet /opt/stellar-default/pubnet
+ADD testnet /opt/stellar-default/testnet
+
+ADD start /
+RUN ["chmod", "+x", "start"]
+
+
+#####
+# Launch
+###
 
 # No-IP dynamic dns configuration
 #  Could be bash script:
 #  curl 'https://username:password@dynupdate.no-ip.com/nic/update?hostname=example.domain.com'
 ADD noip.sh /root/noip.sh
 
-CMD /root/noip.sh && /opt/ripple/bin/rippled --fg --conf /etc/rippled.cfg
 
+ENTRYPOINT /root/noip.sh && /init -- /start --pubnet
